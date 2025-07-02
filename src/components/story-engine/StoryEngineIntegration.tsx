@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { StoryEngine } from './StoryEngine';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,11 +11,7 @@ interface StoryEngineIntegrationProps {
 }
 
 export function StoryEngineIntegration({ onClose }: StoryEngineIntegrationProps) {
-  const [showEngine, setShowEngine] = React.useState(false);
-
-  if (showEngine) {
-    return <StoryEngine />;
-  }
+  // Removed unused state since we're using direct navigation now
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 p-6">
@@ -237,7 +232,7 @@ export function StoryEngineIntegration({ onClose }: StoryEngineIntegrationProps)
                 <Button 
                   size="lg" 
                   className="bg-white text-purple-600 hover:bg-gray-100"
-                  onClick={() => setShowEngine(true)}
+                  onClick={() => window.location.href = '/story-engine'}
                 >
                   <BookOpen className="h-5 w-5 mr-2" />
                   Mulai Membuat Novel

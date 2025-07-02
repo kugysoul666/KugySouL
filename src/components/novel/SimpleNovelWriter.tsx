@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Sparkles, Play, Pause } from 'lucide-react';
+import { Loader2, Sparkles, Play, Pause, ArrowLeft, Trash2 } from 'lucide-react';
 import { sendChatMessage } from '@/services/api';
 import { countWords } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
+import { useRouter } from 'next/navigation';
 
 export default function SimpleNovelWriter() {
+  const router = useRouter();
   const [editorContent, setEditorContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [autoPilotMode, setAutoPilotMode] = useState(false);
@@ -15,12 +17,29 @@ export default function SimpleNovelWriter() {
   const [chapterWordCount, setChapterWordCount] = useState(0);
   const [selectedModel] = useState('gpt-3.5-turbo');
   const [selectedLanguage] = useState('indonesian');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
-  // Update word count when editor content changes
+  // Load saved content on mount (safely for SSR)
+  useEffect(() => {
+    // Only access localStorage in the browser environment
+    if (typeof window !== 'undefined') {
+      const savedContent = localStorage.getItem('novel_content');
+      if (savedContent) {
+        setEditorContent(savedContent);
+      }
+    }
+  }, []);
+
+  // Update word count when editor content changes and save content
   useEffect(() => {
     const words = countWords(editorContent);
     setChapterWordCount(words);
+    
+    // Save content to localStorage (safely for SSR)
+    if (typeof window !== 'undefined' && editorContent) {
+      localStorage.setItem('novel_content', editorContent);
+    }
   }, [editorContent]);
 
   // Clean up interval on unmount
@@ -197,12 +216,55 @@ BEGIN CONTINUATION NOW:`;
   // Calculate progress percentage
   const progressPercentage = chapterWordCount > 0 ? Math.min(100, (chapterWordCount / 2000) * 100) : 0;
 
+  // Handle back navigation
+  const handleBack = () => {
+    router.back();
+  };
+
+  // Handle novel deletion
+  const handleDelete = () => {
+    if (showDeleteConfirm) {
+      // Clear the content and localStorage
+      setEditorContent('');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('novel_content');
+      }
+      toast.success('Novel deleted successfully');
+      setShowDeleteConfirm(false);
+    } else {
+      setShowDeleteConfirm(true);
+      // Auto-hide the confirmation after 3 seconds
+      setTimeout(() => setShowDeleteConfirm(false), 3000);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Simple Novel Writer (2000 Words per Chapter)</h1>
+        <Button 
+          variant={showDeleteConfirm ? "destructive" : "outline"} 
+          size="sm" 
+          onClick={handleDelete}
+          className="flex items-center gap-1"
+        >
+          <Trash2 className="h-4 w-4" />
+          {showDeleteConfirm ? "Confirm Delete" : "Delete Novel"}
+        </Button>
       </div>
       
+      <div className="flex items-center mb-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleBack}
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-900 px-1"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="font-medium">Back</span>
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 gap-4">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center space-x-2">
