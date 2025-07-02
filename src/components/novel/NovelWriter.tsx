@@ -812,7 +812,7 @@ BEGIN CONTINUATION NOW:`;
                   </p>
                 </div>
                 <Button 
-                  onClick={() => setShowStoryEngine(true)}
+                  onClick={() => window.location.href = "/story-engine"}
                   className="bg-white text-purple-600 hover:bg-gray-100 ml-4"
                 >
                   <Layers className="h-4 w-4 mr-2" />
