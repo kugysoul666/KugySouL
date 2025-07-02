@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Sparkles, Play, Pause, ArrowLeft, Trash2 } from 'lucide-react';
+import { Loader2, Sparkles, Play, Pause, Trash2 } from 'lucide-react';
 import { sendChatMessage } from '@/services/api';
 import { countWords } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ export default function SimpleNovelWriter() {
   const [selectedModel] = useState('gpt-3.5-turbo');
   const [selectedLanguage] = useState('indonesian');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   // Load saved content on mount (safely for SSR)
@@ -29,6 +30,11 @@ export default function SimpleNovelWriter() {
       if (savedContent) {
         setEditorContent(savedContent);
       }
+    }
+    
+    // Initialize focus mode and generate content if needed
+    if (focusMode) {
+      generateContent();
     }
   }, []);
 
@@ -267,7 +273,6 @@ BEGIN CONTINUATION NOW:`;
           onClick={handleBack}
           className="flex items-center gap-1 text-gray-600 hover:text-gray-900 px-1"
         >
-          <ArrowLeft className="h-5 w-5" />
           <span className="font-medium">Back</span>
         </Button>
       </div>
