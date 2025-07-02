@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Sparkles, ArrowRight, RefreshCw } from 'lucide-react';
-import { BackButton } from '@/components/ui/back-button';
 
 interface BrainstormingMenuProps {
   project: StoryProject;
