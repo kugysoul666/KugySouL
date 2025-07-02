@@ -15,8 +15,7 @@ import {
   Play,
   Pause,
   Plus,
-  Layers,
-  ArrowLeft
+  Layers
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { sendChatMessage } from '@/services/api';
