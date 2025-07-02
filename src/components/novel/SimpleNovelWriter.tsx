@@ -20,11 +20,14 @@ export default function SimpleNovelWriter() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load saved content on mount
+  // Load saved content on mount (safely for SSR)
   useEffect(() => {
-    const savedContent = localStorage.getItem('novel_content');
-    if (savedContent) {
-      setEditorContent(savedContent);
+    // Only access localStorage in the browser environment
+    if (typeof window !== 'undefined') {
+      const savedContent = localStorage.getItem('novel_content');
+      if (savedContent) {
+        setEditorContent(savedContent);
+      }
     }
   }, []);
 
@@ -33,8 +36,8 @@ export default function SimpleNovelWriter() {
     const words = countWords(editorContent);
     setChapterWordCount(words);
     
-    // Save content to localStorage
-    if (editorContent) {
+    // Save content to localStorage (safely for SSR)
+    if (typeof window !== 'undefined' && editorContent) {
       localStorage.setItem('novel_content', editorContent);
     }
   }, [editorContent]);
@@ -223,7 +226,9 @@ BEGIN CONTINUATION NOW:`;
     if (showDeleteConfirm) {
       // Clear the content and localStorage
       setEditorContent('');
-      localStorage.removeItem('novel_content');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('novel_content');
+      }
       toast.success('Novel deleted successfully');
       setShowDeleteConfirm(false);
     } else {
